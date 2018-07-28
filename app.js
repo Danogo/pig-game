@@ -17,15 +17,35 @@ activePlayer = 0;
 
 document.querySelector('.btn-roll').addEventListener('click', function() {
   // 1. get random number from 1 to 6
-  let diceNum = Math.floor(Math.random() * 6) + 1;
+  let diceRoll = Math.floor(Math.random() * 6) + 1;
   // or Math.ceil(Math.random()*6)
 
   // 2. display the result
   let diceEl = document.querySelector('.dice');
   diceEl.style.display = 'block';
-  diceEl.src = `dice-${diceNum}.png`;
+  diceEl.src = `dice-${diceRoll}.png`;
 
-  // 3. update current score with rolled dice value
-  document.querySelector(`#current-${activePlayer}`).textContent = diceNum;
+  // 3. update current score with rolled dice value if value is not a 1
+  if (diceRoll !== 1) {
+    // Add value to current score
+    roundScore += diceRoll;
+    document.querySelector(`#current-${activePlayer}`).textContent = roundScore;
+  } else {
+    // switch player and reset scores
+    activePlayer = activePlayer === 0 ? 1 : 0;
+    roundScore = 0;
+    document.getElementById('current-0').textContent = '0';
+    document.getElementById('current-1').textContent = '0';
+
+    // change display active player
+    document.querySelector('.player-0-panel').classList.toggle('active');
+    document.querySelector('.player-1-panel').classList.toggle('active');
+
+    // hide dice for next player
+    setTimeout(function() {
+      document.querySelector('.dice').style.display = 'none';
+    }, 1000);
+    
+  }
 
 });
