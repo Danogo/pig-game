@@ -2,11 +2,11 @@
 GAME RULES:
 
 - The game has 2 players, playing in rounds
-- In each turn, a player rolls a dice as many times as he whishes. Each result get added to his ROUND score
-- BUT, if the player rolls a 1, all his ROUND score gets lost. After that, it's the next player's turn
+- In each turn, a player rolls tw dices as many times as he whishes. Each result get added to his ROUND score
+- BUT, if the player rolls a 1, all his ROUND score gets lost. After that, it's the next player's turn, player doesn't lose turn if he rolls 2x 1
 - The player can choose to 'Hold', which means that his ROUND score gets added to his GLBAL score. After that, it's the next player's turn
 - The first player to reach 100 points on GLOBAL score wins the game
-- Player who rolls '6' two times in a row loses all his global score, and it's next player's turn
+- Player who rolls '12' two times in a row loses all his global score, and it's next player's turn
 
 */
 
@@ -17,25 +17,29 @@ init();
 document.querySelector('.btn-roll').addEventListener('click', function () {
   if (gameOn) {
     // 1. get random number from 1 to 6
-    let diceRoll = Math.floor(Math.random() * 6) + 1;
+    let dice1Roll = Math.floor(Math.random() * 6) + 1;
+    let dice2Roll = Math.floor(Math.random() * 6) + 1;
     // or Math.ceil(Math.random()*6)
     // 2. display the result
-    let diceEl = document.querySelector('.dice');
-    diceEl.style.display = 'block';
-    diceEl.src = `dice-${diceRoll}.png`;
-    // 3. update current score with rolled dice value if value is not a 1, reset score if it's second 6 in a row
-    if ( diceRoll === 6 && lastRoll === 6) {
+    let dice1El = document.getElementById('dice-1');
+    let dice2El = document.getElementById('dice-2');
+    dice1El.style.display = 'block';
+    dice2El.style.display = 'block';
+    dice1El.src = `dice-${dice1Roll}.png`;
+    dice2El.src = `dice-${dice2Roll}.png`;
+    // 3. update current score with rolled dice value if value is not a 1, reset score if it's second 12 in a row
+    if (dice1Roll + dice2Roll === 12 && lastRoll === 12) {
       scores[activePlayer] = 0;
       document.getElementById(`score-${activePlayer}`).textContent = '0';
       switchPlayers();
-    } else if (diceRoll !== 1) {
-      // Add value to current score
-      roundScore += diceRoll;
-      document.querySelector(`#current-${activePlayer}`).textContent = roundScore;
-       // set lastRoll for the next roll
-      lastRoll = diceRoll;
-    } else {
+    } else if ((dice1Roll === 1 || dice2Roll === 1) && !(dice1Roll === 1 && dice2Roll === 1)) {
       switchPlayers();
+    } else {
+      // Add value to current score
+      roundScore += dice1Roll + dice2Roll;
+      document.querySelector(`#current-${activePlayer}`).textContent = roundScore;
+      // set lastRoll for the next roll
+      lastRoll = dice1Roll + dice2Roll;
     }
   }
 });
@@ -50,8 +54,8 @@ document.querySelector('.btn-hold').addEventListener('click', function () {
     var winCase = parseInt(document.querySelector('.final-score').value, 10);
     // Check if player won the game, if winCase is empty string it's coerced to false and default win score of 100 is set
     if (globalScore >= (winCase || 100)) {
+      hideDices();
       document.getElementById(`name-${activePlayer}`).textContent = 'Winner!';
-      document.querySelector('.dice').style.display = 'none';
       document.querySelector('.btn-roll').style.display = 'none';
       document.querySelector('.btn-hold').style.display = 'none';
       let activePanel = document.querySelector(`.player-${activePlayer}-panel`);
@@ -79,7 +83,7 @@ function switchPlayers() {
   document.querySelector('.player-1-panel').classList.toggle('active');
   // hide dice for next player
   setTimeout(function () {
-    document.querySelector('.dice').style.display = 'none';
+    hideDices();
   }, 400);
 }
 
@@ -94,11 +98,16 @@ function init() {
   document.getElementById('current-1').textContent = '0';
   document.getElementById('score-0').textContent = '0';
   document.getElementById('score-1').textContent = '0';
-  document.querySelector('.dice').style.display = 'none';
   document.querySelector('.player-0-panel').className = 'player-0-panel active';
   document.querySelector('.player-1-panel').className = 'player-1-panel';
   document.getElementById('name-0').textContent = 'Player 1';
   document.getElementById('name-1').textContent = 'Player 2';
   document.querySelector('.btn-roll').style.display = 'block';
   document.querySelector('.btn-hold').style.display = 'block';
+  hideDices();
+}
+
+function hideDices() {
+  document.getElementById('dice-1').style.display = 'none';
+  document.getElementById('dice-2').style.display = 'none';
 }
